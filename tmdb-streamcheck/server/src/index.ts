@@ -1,23 +1,21 @@
 import express from 'express';
+import type { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import moviesRouter from './app';
 
 dotenv.config();
+
 const app = express();
+
+const PORT = Number(process.env.PORT ?? 4000);
+
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT ?? 4000;
+app.get('/api/health', (_req: Request, res: Response) => res.json({ status: 'ok' }));
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-
-app.get('/api/movies', (_req, res) =>
-  res.json({
-    movies: [
-      { id: 1, title: 'Example Movie' }
-    ]
-  })
-);
+app.use('/api/movies', moviesRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
