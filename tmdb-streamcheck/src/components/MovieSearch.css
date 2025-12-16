@@ -1,0 +1,139 @@
+.movie-search-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.search-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.loading-indicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.results-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.result-item {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  background-color: white;
+}
+
+.result-item:hover {
+  background-color: #f0f0f0;
+}
+
+.result-poster {
+  width: 46px;
+  height: 69px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.result-info {
+  flex: 1;
+}
+
+.result-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.result-year {
+  color: #666;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #ffe6e6;
+  border-radius: 4px;
+}
+
+.movie-detail-container {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.movie-detail-flex {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.movie-detail-poster {
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.movie-detail-info {
+  flex: 1;
+  min-width: 300px;
+}
+
+.movie-detail-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.movie-detail-release {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.movie-detail-field {
+  margin-bottom: 10px;
+}
+
+.movie-detail-overview-container {
+  margin-top: 15px;
+}
+
+.movie-detail-overview-title {
+  margin-bottom: 8px;
+}
+
+.movie-detail-overview-text {
+  line-height: 1.6;
+}
+

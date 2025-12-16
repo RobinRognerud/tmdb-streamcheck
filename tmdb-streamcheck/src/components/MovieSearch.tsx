@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDebounce } from '../hooks/useDebounce';
+import './MovieSearch.css';
 
 interface MovieSummary {
   id: number;
@@ -15,6 +16,7 @@ interface MovieDetail {
   release_date?: string;
   poster_path?: string | null;
   vote_average?: number;
+  popularity?: number;
   runtime?: number;
   genres?: Array<{ id: number; name: string }>;
 }
@@ -85,8 +87,8 @@ export function MovieSearch() {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: '20px' }}>
-      <div style={{ position: 'relative', marginBottom: '20px' }}>
+    <div className="movie-search-container">
+      <div className="search-container">
         <input
           type="text"
           value={query}
@@ -95,80 +97,35 @@ export function MovieSearch() {
             setSelectedMovie(null);
           }}
           placeholder="Search for a movie..."
-          style={{
-            width: '100%',
-            padding: '12px',
-            fontSize: '16px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            boxSizing: 'border-box',
-          }}
+          className="search-input"
           autoComplete="off"
         />
 
         {isLoading && (
-          <div
-            style={{
-              position: 'absolute',
-              right: 12,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#666',
-            }}
-          >
+          <div className="loading-indicator">
             Loading...
           </div>
         )}
 
         {results.length > 0 && (
-          <ul
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              background: 'white',
-              border: '1px solid #ccc',
-              borderTop: 'none',
-              listStyle: 'none',
-              margin: 0,
-              padding: 0,
-              maxHeight: 400,
-              overflowY: 'auto',
-              zIndex: 1000,
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            }}
-          >
+          <ul className="results-list">
             {results.map((movie) => (
               <li
                 key={movie.id}
                 onClick={() => handleSelectMovie(movie)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                }}
-                style={{
-                  padding: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  gap: '12px',
-                  alignItems: 'center',
-                  borderBottom: '1px solid #eee',
-                }}
+                className="result-item"
               >
                 {movie.poster_path && (
                   <img
                     src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
                     alt={movie.title}
-                    style={{ width: 46, height: 69, objectFit: 'cover', borderRadius: '4px' }}
+                    className="result-poster"
                   />
                 )}
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{movie.title}</div>
+                <div className="result-info">
+                  <div className="result-title">{movie.title}</div>
                   {movie.release_date && (
-                    <small style={{ color: '#666' }}>
+                    <small className="result-year">
                       {new Date(movie.release_date).getFullYear()}
                     </small>
                   )}
@@ -180,61 +137,53 @@ export function MovieSearch() {
       </div>
 
       {error && (
-        <div style={{ color: 'red', marginBottom: '20px', padding: '10px', background: '#ffe6e6', borderRadius: '4px' }}>
+        <div className="error-message">
           {error}
         </div>
       )}
 
       {selectedMovie && (
-        <div
-          style={{
-            marginTop: '24px',
-            padding: '20px',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            background: '#f9f9f9',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+        <div className="movie-detail-container">
+          <div className="movie-detail-flex">
             {selectedMovie.poster_path && (
               <img
                 src={`https://image.tmdb.org/t/p/w342${selectedMovie.poster_path}`}
                 alt={selectedMovie.title}
-                style={{
-                  width: 200,
-                  height: 'auto',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                }}
+                className="movie-detail-poster"
               />
             )}
-            <div style={{ flex: 1, minWidth: 300 }}>
-              <h2 style={{ marginTop: 0, marginBottom: '10px' }}>{selectedMovie.title}</h2>
+            <div className="movie-detail-info">
+              <h2 className="movie-detail-title">{selectedMovie.title}</h2>
               {selectedMovie.release_date && (
-                <p style={{ color: '#666', marginBottom: '10px' }}>
+                <p className="movie-detail-release">
                   Release: {new Date(selectedMovie.release_date).toLocaleDateString()}
                 </p>
               )}
               {selectedMovie.vote_average !== undefined && (
-                <p style={{ marginBottom: '10px' }}>
+                <p className="movie-detail-field">
                   <strong>Rating:</strong> {selectedMovie.vote_average.toFixed(1)}/10
                 </p>
               )}
+              {selectedMovie.popularity !== undefined && (
+                <p className="movie-detail-field">
+                  <strong>Popularity:</strong> {selectedMovie.popularity.toFixed(1)}
+                </p>
+              )}
               {selectedMovie.runtime && (
-                <p style={{ marginBottom: '10px' }}>
+                <p className="movie-detail-field">
                   <strong>Runtime:</strong> {selectedMovie.runtime} minutes
                 </p>
               )}
               {selectedMovie.genres && selectedMovie.genres.length > 0 && (
-                <p style={{ marginBottom: '10px' }}>
+                <p className="movie-detail-field">
                   <strong>Genres:</strong>{' '}
                   {selectedMovie.genres.map((g) => g.name).join(', ')}
                 </p>
               )}
               {selectedMovie.overview && (
-                <div style={{ marginTop: '15px' }}>
-                  <h3 style={{ marginBottom: '8px' }}>Overview</h3>
-                  <p style={{ lineHeight: '1.6' }}>{selectedMovie.overview}</p>
+                <div className="movie-detail-overview-container">
+                  <h3 className="movie-detail-overview-title">Overview</h3>
+                  <p className="movie-detail-overview-text">{selectedMovie.overview}</p>
                 </div>
               )}
             </div>

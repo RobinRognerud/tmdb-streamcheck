@@ -1,19 +1,6 @@
 import type { Request, Response } from 'express';
 import { tmdbFetch } from '../services/tmdbClient';
 
-export async function popularMovies(req: Request, res: Response) {
-  try {
-    const page = String(req.query.page ?? '1');
-    const language = String(req.query.language ?? 'en-US');
-
-    const data = await tmdbFetch('/movie/popular', { page, language });
-    res.json(data);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    res.status(502).json({ error: message });
-  }
-}
-
 export async function searchMovies(req: Request, res: Response) {
   try {
     const q = String(req.query.q ?? '');
