@@ -22,6 +22,25 @@ interface MovieDetail {
   genres?: Array<{ id: number; name: string }>;
 }
 
+interface WatchProvider {
+  display_priority: number;
+  logo_path: string;
+  provider_name: string;
+  provider_id: number;
+}
+
+interface WatchProviders {
+  flatrate?: WatchProvider[];
+  rent?: WatchProvider[];
+  buy?: WatchProvider[];
+}
+
+interface WatchProvidersResponse {
+  results: {
+    [countryCode: string]: WatchProviders;
+  };
+}
+
 interface SearchResponse {
   results: MovieSummary[];
   total_results?: number;
@@ -63,6 +82,7 @@ export function MovieSearch() {
   const [results, setResults] = useState<MovieSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
+  const [watchProviders, setWatchProviders] = useState<WatchProviders | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch search results
@@ -106,15 +126,43 @@ export function MovieSearch() {
     setQuery(movie.title);
     setResults([]);
     setSelectedMovie(null);
+    setWatchProviders(null);
     setError(null);
 
+    // Fetch movie details
     fetch(`/api/movies/${movie.id}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load movie');
         return res.json();
       })
-      .then((data: MovieDetail) => setSelectedMovie(data))
-      .catch((e) => setError(e.message));
+      .then((data: MovieDetail) => {
+        setSelectedMovie(data);
+        // Fetch watch providers (non-blocking)
+        fetch(`/api/movies/${movie.id}/watch-providers?watch_region=NO`)
+          .then((res) => {
+            if (!res.ok) {
+              // Watch providers not available is not a critical error
+              return null;
+            }
+            return res.json();
+          })
+          .then((data: WatchProvidersResponse | null) => {
+            if (data) {
+              // Get Norwegian providers (NO)
+              const noProviders = data.results?.NO;
+              setWatchProviders(noProviders || null);
+            } else {
+              setWatchProviders(null);
+            }
+          })
+          .catch(() => {
+            // Silently fail for watch providers - not critical
+            setWatchProviders(null);
+          });
+      })
+      .catch((e) => {
+        setError(e.message);
+      });
   };
 
   return (
@@ -204,6 +252,27 @@ export function MovieSearch() {
                   <strong>Genres:</strong>{' '}
                   {selectedMovie.genres.map((g) => g.name).join(', ')}
                 </p>
+              )}
+              {watchProviders && watchProviders.flatrate && watchProviders.flatrate.length > 0 && (
+                <div className="movie-detail-watch-providers">
+                  <div className="watch-providers-section">
+                    <strong>Stream på:</strong>
+                    <div className="watch-providers-list">
+                      {watchProviders.flatrate.map((provider) => (
+                        <div key={provider.provider_id} className="watch-provider-item">
+                          {provider.logo_path && (
+                            <img
+                              src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                              alt={provider.provider_name}
+                              className="watch-provider-logo"
+                            />
+                          )}
+                          <span className="watch-provider-name">{provider.provider_name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
               {selectedMovie.overview && (
                 <div className="movie-detail-overview-container">

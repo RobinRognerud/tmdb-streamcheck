@@ -44,4 +44,23 @@ export async function getMovieDetails(req: Request, res: Response) {
   }
 }
 
+export async function getMovieWatchProviders(req: Request, res: Response) {
+  try {
+    const movieId = String(req.params.id ?? '');
+    if (!movieId) {
+      return res.status(400).json({ error: 'movie ID is required' });
+    }
 
+    const language = String(req.query.language ?? 'en-US');
+    const watchRegion = String(req.query.watch_region ?? 'NO');
+
+    const data = await tmdbFetch(`/movie/${movieId}/watch/providers`, {
+      language,
+      watch_region: watchRegion
+    });
+    res.json(data);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(502).json({ error: message });
+  }
+}
