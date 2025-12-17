@@ -7,6 +7,8 @@ interface MovieSummary {
   title: string;
   release_date?: string;
   poster_path?: string | null;
+  popularity?: number;
+  vote_average?: number;
 }
 
 interface MovieDetail {
@@ -16,7 +18,6 @@ interface MovieDetail {
   release_date?: string;
   poster_path?: string | null;
   vote_average?: number;
-  popularity?: number;
   runtime?: number;
   genres?: Array<{ id: number; name: string }>;
 }
@@ -24,6 +25,35 @@ interface MovieDetail {
 interface SearchResponse {
   results: MovieSummary[];
   total_results?: number;
+}
+
+/**
+ * Sorterer filmer for å gi beste brukeropplevelse:
+ * 1. Vurdering (høyest først) - høyest vurderte filmer først
+ * 2. Popularitet (høyest først) - mest relevante populære filmer innen samme vurdering
+ * 3. Utgivelsesår (nyeste først) - nyere filmer først som tie-breaker
+ */
+function sortMovies(movies: MovieSummary[]): MovieSummary[] {
+  return [...movies].sort((a, b) => {
+    // Sorter først på vurdering (høyest først)
+    const ratingA = a.vote_average ?? 0;
+    const ratingB = b.vote_average ?? 0;
+    if (ratingB !== ratingA) {
+      return ratingB - ratingA;
+    }
+
+    // Så på popularitet (høyest først)
+    const popularityA = a.popularity ?? 0;
+    const popularityB = b.popularity ?? 0;
+    if (popularityB !== popularityA) {
+      return popularityB - popularityA;
+    }
+
+    // Til slutt på utgivelsesår (nyeste først)
+    const yearA = a.release_date ? new Date(a.release_date).getFullYear() : 0;
+    const yearB = b.release_date ? new Date(b.release_date).getFullYear() : 0;
+    return yearB - yearA;
+  });
 }
 
 export function MovieSearch() {
@@ -53,7 +83,8 @@ export function MovieSearch() {
       })
       .then((data: SearchResponse) => {
         if (!cancelled) {
-          setResults(data.results ?? []);
+          const sortedResults = sortMovies(data.results ?? []);
+          setResults(sortedResults);
         }
       })
       .catch((e) => {
@@ -94,7 +125,6 @@ export function MovieSearch() {
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            setSelectedMovie(null);
           }}
           placeholder="Search for a movie..."
           className="search-input"
@@ -107,7 +137,7 @@ export function MovieSearch() {
           </div>
         )}
 
-        {results.length > 0 && (
+        {results.length > 0 && (!selectedMovie || query !== selectedMovie.title) && (
           <ul className="results-list">
             {results.map((movie) => (
               <li
@@ -162,11 +192,6 @@ export function MovieSearch() {
               {selectedMovie.vote_average !== undefined && (
                 <p className="movie-detail-field">
                   <strong>Rating:</strong> {selectedMovie.vote_average.toFixed(1)}/10
-                </p>
-              )}
-              {selectedMovie.popularity !== undefined && (
-                <p className="movie-detail-field">
-                  <strong>Popularity:</strong> {selectedMovie.popularity.toFixed(1)}
                 </p>
               )}
               {selectedMovie.runtime && (
