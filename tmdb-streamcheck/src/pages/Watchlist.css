@@ -6,8 +6,30 @@
 
 .watchlist-title {
   font-size: 2rem;
-  margin-bottom: 2rem;
+  margin: 0;
   color: #6e6565;
+}
+
+.watchlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.watchlist-clear-button {
+  background: transparent;
+  border: 1px solid rgba(220,53,69,0.15);
+  color: rgba(220,53,69,0.9);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.watchlist-clear-button:hover {
+  background: rgba(220,53,69,0.06);
 }
 
 .watchlist-empty {

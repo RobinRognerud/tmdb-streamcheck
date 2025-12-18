@@ -12,6 +12,7 @@ export function Header() {
           <Link to="/" className="nav-link">Hjem</Link>
           <Link to="/moviesearch" className="nav-link">Filmsøk</Link>
           <Link to="/watchlist" className="nav-link">Watchlist</Link>
+          <Link to="/import-letterboxd" className="nav-link">Importer</Link>
         </nav>
       </div>
     </header>

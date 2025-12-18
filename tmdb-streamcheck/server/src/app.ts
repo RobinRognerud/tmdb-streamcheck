@@ -1,6 +1,6 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import { searchMovies, getMovieDetails, getMovieWatchProviders } from './routes/tmdb';
+import { searchMovies, getMovieDetails, getMovieWatchProviders, getMovieReleaseDates } from './routes/tmdb';
 
 const router = express.Router();
 
@@ -10,6 +10,10 @@ router.get('/search', (req: Request, res: Response) => {
 
 router.get('/:id/watch-providers', (req: Request, res: Response) => {
   void getMovieWatchProviders(req, res);
+});
+
+router.get('/:id/release-dates', (req: Request, res: Response) => {
+  void getMovieReleaseDates(req, res);
 });
 
 router.get('/:id', (req: Request, res: Response) => {

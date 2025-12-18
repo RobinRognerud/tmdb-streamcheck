@@ -22,7 +22,7 @@ interface MovieDetail {
 }
 
 export function Watchlist() {
-  const { watchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
+  const { watchlist, removeFromWatchlist, clearWatchlist, isInWatchlist } = useWatchlist();
   const [providersMap, setProvidersMap] = useState<Map<number, WatchProviders | null>>(new Map());
   const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
   const [watchProviders, setWatchProviders] = useState<WatchProviders | null>(null);
@@ -134,7 +134,21 @@ export function Watchlist() {
 
   return (
     <div className="watchlist-container">
-      <h1 className="watchlist-title">Min Watchlist ({watchlist.length})</h1>
+      <div className="watchlist-header">
+        <h1 className="watchlist-title">Min Watchlist ({watchlist.length})</h1>
+        <button
+          className="watchlist-clear-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (watchlist.length === 0) return;
+            const ok = window.confirm(`Fjern alle ${watchlist.length} filmer fra watchlisten?`);
+            if (ok) clearWatchlist();
+          }}
+        >
+          Fjern alle
+        </button>
+      </div>
+
       <div className="watchlist-grid">
         {watchlist.map((movie) => (
           <div

@@ -36,6 +36,7 @@ interface WatchlistContextType {
   watchlist: WatchlistMovie[];
   addToWatchlist: (movie: Omit<WatchlistMovie, 'addedAt'>) => void;
   removeFromWatchlist: (movieId: number) => void;
+  clearWatchlist: () => void;
   isInWatchlist: (movieId: number) => boolean;
 }
 
@@ -88,6 +89,10 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
     setWatchlist((prev) => prev.filter((m) => m.id !== movieId));
   };
 
+  const clearWatchlist = () => {
+    setWatchlist([]);
+  };
+
   const isInWatchlist = (movieId: number) => {
     return watchlist.some((m) => m.id === movieId);
   };
@@ -98,6 +103,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
         watchlist,
         addToWatchlist,
         removeFromWatchlist,
+        clearWatchlist,
         isInWatchlist,
       }}
     >

@@ -11,13 +11,16 @@ export async function searchMovies(req: Request, res: Response) {
     const page = Number(req.query.page ?? '1');
     const language = String(req.query.language ?? 'en-US');
     const region = String(req.query.region ?? 'NO');
+    // Optional year filter from client (e.g. Letterboxd CSV import)
+    const year = req.query.year ? String(req.query.year) : undefined;
 
     const data = await tmdbFetch('/search/movie', {
       query: q,
       page,
       include_adult: 'false',
       language,
-      region
+      region,
+      ...(year ? { year } : {}),
     });
 
     res.json(data);
@@ -58,6 +61,21 @@ export async function getMovieWatchProviders(req: Request, res: Response) {
       language,
       watch_region: watchRegion
     });
+    res.json(data);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(502).json({ error: message });
+  }
+}
+
+export async function getMovieReleaseDates(req: Request, res: Response) {
+  try {
+    const movieId = String(req.params.id ?? '');
+    if (!movieId) {
+      return res.status(400).json({ error: 'movie ID is required' });
+    }
+
+    const data = await tmdbFetch(`/movie/${movieId}/release_dates`);
     res.json(data);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
