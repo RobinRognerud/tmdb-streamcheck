@@ -5,12 +5,12 @@ export function Home() {
   return (
     <div className="home-container">
       <div className="home-content">
-        <h1 className="home-title">Welcome to TMDB StreamCheck</h1>
+        <h1 className="home-title">Velkommen til min side</h1>
         <p className="home-description">
-          Search for movies and find out where you can stream them in Norway.
+          Søk etter filmer og finn ut hvor du kan se dem i Norge.
         </p>
         <Link to="/moviesearch" className="home-cta">
-          Start Searching
+          Start søking
         </Link>
       </div>
     </div>

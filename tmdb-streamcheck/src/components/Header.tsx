@@ -6,11 +6,12 @@ export function Header() {
     <header className="header">
       <div className="header-container">
         <Link to="/" className="header-logo">
-          <h1>TMDB StreamCheck</h1>
+          <h1>Sjekk streamen</h1>
         </Link>
         <nav className="header-nav">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/moviesearch" className="nav-link">Movie Search</Link>
+          <Link to="/" className="nav-link">Hjem</Link>
+          <Link to="/moviesearch" className="nav-link">Filmsøk</Link>
+          <Link to="/watchlist" className="nav-link">Watchlist</Link>
         </nav>
       </div>
     </header>

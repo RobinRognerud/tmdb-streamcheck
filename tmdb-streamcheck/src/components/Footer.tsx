@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <p className="footer-text">
-          Powered by{' '}
+          Info fra{' '}
           <a
             href="https://www.themoviedb.org/"
             target="_blank"
@@ -14,9 +14,6 @@ export function Footer() {
           >
             TMDB
           </a>
-        </p>
-        <p className="footer-copyright">
-          © {new Date().getFullYear()} TMDB StreamCheck
         </p>
       </div>
     </footer>

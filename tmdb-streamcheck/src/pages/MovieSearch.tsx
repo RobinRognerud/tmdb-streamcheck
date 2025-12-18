@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDebounce } from '../hooks/useDebounce';
+import { useWatchlist } from '../contexts/WatchlistContext';
 import './MovieSearch.css';
 
 interface MovieSummary {
@@ -78,11 +79,13 @@ function sortMovies(movies: MovieSummary[]): MovieSummary[] {
 export function MovieSearch() {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 400);
+  const { addToWatchlist, isInWatchlist } = useWatchlist();
 
   const [results, setResults] = useState<MovieSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
   const [watchProviders, setWatchProviders] = useState<WatchProviders | null>(null);
+  const [watchProvidersLoaded, setWatchProvidersLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch search results
@@ -127,6 +130,7 @@ export function MovieSearch() {
     setResults([]);
     setSelectedMovie(null);
     setWatchProviders(null);
+    setWatchProvidersLoaded(false);
     setError(null);
 
     // Fetch movie details
@@ -138,6 +142,7 @@ export function MovieSearch() {
       .then((data: MovieDetail) => {
         setSelectedMovie(data);
         // Fetch watch providers (non-blocking)
+        setWatchProvidersLoaded(false);
         fetch(`/api/movies/${movie.id}/watch-providers?watch_region=NO`)
           .then((res) => {
             if (!res.ok) {
@@ -154,10 +159,12 @@ export function MovieSearch() {
             } else {
               setWatchProviders(null);
             }
+            setWatchProvidersLoaded(true);
           })
           .catch(() => {
             // Silently fail for watch providers - not critical
             setWatchProviders(null);
+            setWatchProvidersLoaded(true);
           });
       })
       .catch((e) => {
@@ -174,14 +181,14 @@ export function MovieSearch() {
           onChange={(e) => {
             setQuery(e.target.value);
           }}
-          placeholder="Search for a movie..."
+          placeholder="Søk etter film..."
           className="search-input"
           autoComplete="off"
         />
 
         {isLoading && (
           <div className="loading-indicator">
-            Loading...
+            Laster...
           </div>
         )}
 
@@ -231,52 +238,81 @@ export function MovieSearch() {
               />
             )}
             <div className="movie-detail-info">
-              <h2 className="movie-detail-title">{selectedMovie.title}</h2>
+              <div className="movie-detail-header">
+                <h2 className="movie-detail-title">{selectedMovie.title}</h2>
+                {!isInWatchlist(selectedMovie.id) ? (
+                  <button
+                    onClick={() =>
+                      addToWatchlist({
+                        id: selectedMovie.id,
+                        title: selectedMovie.title,
+                        release_date: selectedMovie.release_date,
+                        poster_path: selectedMovie.poster_path,
+                        vote_average: selectedMovie.vote_average,
+                        overview: selectedMovie.overview,
+                      })
+                    }
+                    className="add-to-watchlist-button"
+                  >
+                    + Legg til i watchlist
+                  </button>
+                ) : (
+                  <span className="in-watchlist-badge">✓ I watchlist</span>
+                )}
+              </div>
               {selectedMovie.release_date && (
                 <p className="movie-detail-release">
-                  Release: {new Date(selectedMovie.release_date).toLocaleDateString()}
+                  Utgivelsesdato: {new Date(selectedMovie.release_date).toLocaleDateString()}
                 </p>
               )}
               {selectedMovie.vote_average !== undefined && (
                 <p className="movie-detail-field">
-                  <strong>Rating:</strong> {selectedMovie.vote_average.toFixed(1)}/10
+                  <strong>Vurdering:</strong> {selectedMovie.vote_average.toFixed(1)}/10
                 </p>
               )}
               {selectedMovie.runtime && (
                 <p className="movie-detail-field">
-                  <strong>Runtime:</strong> {selectedMovie.runtime} minutes
+                  <strong>Spilletid:</strong> {selectedMovie.runtime} minutter
                 </p>
               )}
               {selectedMovie.genres && selectedMovie.genres.length > 0 && (
                 <p className="movie-detail-field">
-                  <strong>Genres:</strong>{' '}
+                  <strong>Genre:</strong>{' '}
                   {selectedMovie.genres.map((g) => g.name).join(', ')}
                 </p>
               )}
-              {watchProviders && watchProviders.flatrate && watchProviders.flatrate.length > 0 && (
+              {watchProvidersLoaded && (
                 <div className="movie-detail-watch-providers">
-                  <div className="watch-providers-section">
-                    <strong>Stream på:</strong>
-                    <div className="watch-providers-list">
-                      {watchProviders.flatrate.map((provider) => (
-                        <div key={provider.provider_id} className="watch-provider-item">
-                          {provider.logo_path && (
-                            <img
-                              src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
-                              alt={provider.provider_name}
-                              className="watch-provider-logo"
-                            />
-                          )}
-                          <span className="watch-provider-name">{provider.provider_name}</span>
-                        </div>
-                      ))}
+                  {watchProviders && watchProviders.flatrate && watchProviders.flatrate.length > 0 ? (
+                    <div className="watch-providers-section">
+                      <strong>Kan ses på:</strong>
+                      <div className="watch-providers-list">
+                        {watchProviders.flatrate.map((provider) => (
+                          <div key={provider.provider_id} className="watch-provider-item">
+                            {provider.logo_path && (
+                              <img
+                                src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                                alt={provider.provider_name}
+                                className="watch-provider-logo"
+                              />
+                            )}
+                            <span className="watch-provider-name">{provider.provider_name}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="watch-providers-section">
+                      <p className="no-streaming-message">
+                        Ingen streaming-tjenester tilgjengelig for denne filmen i Norge.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
               {selectedMovie.overview && (
                 <div className="movie-detail-overview-container">
-                  <h3 className="movie-detail-overview-title">Overview</h3>
+                  <h3 className="movie-detail-overview-title">Sammendrag</h3>
                   <p className="movie-detail-overview-text">{selectedMovie.overview}</p>
                 </div>
               )}

@@ -59,7 +59,8 @@
 
 .result-poster {
   width: 46px;
-  height: 69px;
+  height: auto;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 4px;
 }
@@ -100,8 +101,11 @@
 }
 
 .movie-detail-poster {
-  width: 200px;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 2 / 3;
   height: auto;
+  object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -111,9 +115,51 @@
   min-width: 300px;
 }
 
+.movie-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
 .movie-detail-title {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.add-to-watchlist-button {
+  padding: 0.5rem 1rem;
+  background-color: #537c3a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.add-to-watchlist-button:hover {
+  background-color: #45632f;
+  transform: translateY(-1px);
+}
+
+.add-to-watchlist-button:active {
+  transform: translateY(0);
+}
+
+.in-watchlist-badge {
+  padding: 0.5rem 1rem;
+  background-color: #354a25;
+  color: #f1c96b;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .movie-detail-release {
@@ -183,5 +229,15 @@
 .watch-provider-name {
   font-size: 14px;
   color: #333;
+}
+
+.no-streaming-message {
+  color: #666;
+  font-style: italic;
+  margin: 0;
+  padding: 12px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  text-align: center;
 }
 
