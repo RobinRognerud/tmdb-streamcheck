@@ -29,6 +29,10 @@ export function Watchlist() {
   const [watchProvidersLoaded, setWatchProvidersLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Provider filter state
+  const [selectedProviderIds, setSelectedProviderIds] = useState<number[]>([]);
+  const [hideNoProviders, setHideNoProviders] = useState(false);
+
   // Handle ESC key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -77,6 +81,48 @@ export function Watchlist() {
       fetchProviders();
     }
   }, [watchlist]);
+
+  // Compute available providers across the current watchlist
+  const availableProviders = Array.from(providersMap.entries()).reduce((acc, [, prov]) => {
+    if (!prov) return acc;
+    // Only consider 'flatrate' providers (streaming) for filtering
+    const arr = (prov as any).flatrate;
+    if (Array.isArray(arr)) {
+      arr.forEach((p: any) => {
+        if (!acc.has(p.provider_id)) {
+          acc.set(p.provider_id, { ...p, count: 1 });
+        } else {
+          acc.get(p.provider_id).count++;
+        }
+      });
+    }
+    return acc;
+  }, new Map<number, any>());
+
+  const toggleProvider = (id: number) => {
+    setSelectedProviderIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      return [...prev, id];
+    });
+  };
+
+  const filteredWatchlist = watchlist.filter((movie) => {
+    const prov = providersMap.get(movie.id);
+
+    // If hideNoProviders is on, hide movies that do NOT have flatrate (streaming) providers
+    const hasFlatrate = prov && (prov.flatrate && prov.flatrate.length > 0);
+    if (hideNoProviders && !hasFlatrate) return false;
+
+    // If no provider selected, show movie (subject to hideNoProviders)
+    if (selectedProviderIds.length === 0) return true;
+
+    // Show movie if any of the selected providers exist for this movie
+    const providerIds = new Set<number>();
+    if (prov && Array.isArray(prov.flatrate)) {
+      prov.flatrate.forEach((p: any) => providerIds.add(p.provider_id));
+    }
+    return selectedProviderIds.some((id) => providerIds.has(id));
+  });
 
   const handleSelectMovie = (movieId: number) => {
     setSelectedMovie(null);
@@ -136,21 +182,59 @@ export function Watchlist() {
     <div className="watchlist-container">
       <div className="watchlist-header">
         <h1 className="watchlist-title">Min Watchlist ({watchlist.length})</h1>
-        <button
-          className="watchlist-clear-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (watchlist.length === 0) return;
-            const ok = window.confirm(`Fjern alle ${watchlist.length} filmer fra watchlisten?`);
-            if (ok) clearWatchlist();
-          }}
-        >
-          Fjern alle
-        </button>
+        <div className="watchlist-header-actions">
+          <label className="hide-no-providers">
+            <input type="checkbox" checked={hideNoProviders} onChange={(e) => setHideNoProviders(e.target.checked)} />
+            Skjul filmer uten streamingtjeneste
+          </label>
+          <button
+            className="watchlist-filter-clear-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedProviderIds([]);
+              setHideNoProviders(false);
+            }}
+            disabled={selectedProviderIds.length === 0 && !hideNoProviders}
+          >
+            Rydd filter
+          </button>
+          <button
+            className="watchlist-clear-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (watchlist.length === 0) return;
+              const ok = window.confirm(`Fjern alle ${watchlist.length} filmer fra watchlisten?`);
+              if (ok) clearWatchlist();
+            }}
+          >
+            Fjern alle
+          </button>
+        </div>
+      </div>
+
+      {/* Provider filters */}
+      <div className="provider-filters">
+        {Array.from(availableProviders.values()).map((p: any) => (
+          <button
+            key={p.provider_id}
+            className={`provider-filter ${selectedProviderIds.includes(p.provider_id) ? 'active' : ''}`}
+            onClick={() => toggleProvider(p.provider_id)}
+            title={`${p.provider_name} (${p.count})`}
+          >
+            {p.logo_path ? (
+              <img src={`https://image.tmdb.org/t/p/w45${p.logo_path}`} alt={p.provider_name} />
+            ) : (
+              <span className="provider-name-short">{p.provider_name}</span>
+            )}
+          </button>
+        ))}
+        {Array.from(availableProviders.values()).length === 0 && (
+          <div className="no-providers-hint">Ingen streaming-data tilgjengelig ennå.</div>
+        )}
       </div>
 
       <div className="watchlist-grid">
-        {watchlist.map((movie) => (
+        {filteredWatchlist.map((movie) => (
           <div
             key={movie.id}
             className="watchlist-item"
