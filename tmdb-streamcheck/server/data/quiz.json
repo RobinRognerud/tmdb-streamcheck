@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "title": "The Matrix",
+    "release_year": 1999,
+    "actors": ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
+    "genres": ["Action", "Science Fiction"],
+    "director": "Lana Wachowski & Lilly Wachowski",
+    "runtime": 136,
+    "country": "USA",
+    "overview": "A computer hacker learns about the true nature of his reality and his role in the war against its controllers."
+  },
+  {
+    "id": "2",
+    "title": "Inception",
+    "release_year": 2010,
+    "actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+    "genres": ["Action", "Thriller", "Science Fiction"],
+    "director": "Christopher Nolan",
+    "runtime": 148,
+    "country": "USA",
+    "overview": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO."
+  }
+]

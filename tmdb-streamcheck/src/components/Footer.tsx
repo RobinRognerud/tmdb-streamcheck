@@ -15,6 +15,18 @@ export function Footer() {
             TMDB
           </a>
         </p>
+
+        <div className="footer-letterboxd-wrap">
+          <a
+            href="https://letterboxd.com/robinro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link footer-letterboxd"
+            aria-label="Letterboxd - robinro"
+          >
+            <img src="https://letterboxd.com/favicon.ico" alt="Letterboxd logo" className="footer-letterboxd-logo" />
+          </a>
+        </div>
       </div>
     </footer>
   );

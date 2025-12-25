@@ -30,9 +30,20 @@
   text-decoration: underline;
 }
 
-.footer-copyright {
-  color: #666;
-  margin: 0;
-  font-size: 0.85rem;
+.footer-letterboxd-wrap { margin-top: 8px; }
+
+.footer-letterboxd {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.footer-letterboxd-logo {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 3px;
 }
 
